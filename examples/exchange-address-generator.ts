@@ -258,7 +258,10 @@ async function main() {
 }
 
 /**
- * Helper function to format address for display
+ * Helper function to format address for display in UIs
+ * Truncates long addresses to show first and last parts
+ * Example: "EQABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345" 
+ *       -> "EQABCDEFGH...vwxyz012345"
  */
 function formatAddress(address: string): string {
     if (address.length <= 20) return address;

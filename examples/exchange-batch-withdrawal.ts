@@ -200,7 +200,13 @@ class BatchWithdrawalProcessor {
             console.log(`✅ Batch sent successfully!`);
             console.log(`   Transaction: ${simulatedTxHash}`);
             
-            // Mark all as completed (in production, wait for confirmation)
+            // TODO: In production, implement proper transaction confirmation:
+            // 1. Wait for transaction to be included in a block
+            // 2. Verify transaction status using the actual transaction hash
+            // 3. Check for bounce messages indicating failures
+            // 4. Only mark as completed after sufficient confirmations
+            
+            // For demo purposes only - mark as completed with simulated hash
             for (const withdrawal of withdrawals) {
                 await this.db.markWithdrawalCompleted(withdrawal.withdrawalId, simulatedTxHash);
             }

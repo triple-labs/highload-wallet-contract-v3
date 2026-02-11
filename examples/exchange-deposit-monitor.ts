@@ -260,9 +260,12 @@ class DepositMonitor {
             }
 
             // Get current seqno for confirmation tracking
+            // Note: TonClient API structure may vary by version
             const masterchainInfo = await this.client.getMasterchainInfo();
-            // masterchainInfo has different structure depending on client version
-            const currentSeqno = (masterchainInfo as any).last?.seqno || (masterchainInfo as any).latestSeqno || 0;
+            type MasterchainInfo = { last: { seqno: number } } | { latestSeqno: number };
+            const currentSeqno = (masterchainInfo as MasterchainInfo & { last?: { seqno: number }, latestSeqno?: number }).last?.seqno 
+                || (masterchainInfo as MasterchainInfo & { last?: { seqno: number }, latestSeqno?: number }).latestSeqno 
+                || 0;
             await this.processPendingDeposits(currentSeqno);
 
         } catch (e) {
