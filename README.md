@@ -18,12 +18,6 @@ Test:
 
 `npm run test`
 
-## Exchange Integration
-
-For cryptocurrency exchanges looking to integrate Highload Wallet V3:
- * 📖 [Exchange Integration Guide](./EXCHANGE_INTEGRATION.md) - Complete guide for exchange integration
- * 💼 [Exchange Examples](./examples/) - Practical code examples for deposits, withdrawals, and address generation
-
 Useful examples can be found below:
  * [Withdrawal](https://github.com/toncenter/examples/blob/main/withdrawals-highload.js)
  * [Jetton withdrawal](https://github.com/toncenter/examples/blob/main/withdrawals-jettons.js)
