@@ -93,13 +93,13 @@ class BatchWithdrawalProcessor {
     /**
      * Create outgoing messages for withdrawals
      */
-    private createWithdrawalMessages(withdrawals: WithdrawalRequest[]): OutActionSendMsg[] {
+    private async createWithdrawalMessages(withdrawals: WithdrawalRequest[]): Promise<OutActionSendMsg[]> {
         const messages: OutActionSendMsg[] = [];
 
         for (const withdrawal of withdrawals) {
             try {
                 const destAddress = Address.parse(withdrawal.address);
-                
+
                 // Create internal transfer message
                 const message: OutActionSendMsg = {
                     type: 'sendMsg',
@@ -117,10 +117,10 @@ class BatchWithdrawalProcessor {
 
                 messages.push(message);
                 console.log(`  📤 ${withdrawal.userId}: ${withdrawal.amount} nanotons to ${withdrawal.address}`);
-                
+
             } catch (e) {
                 console.error(`  ⚠️  Invalid withdrawal ${withdrawal.withdrawalId}:`, e);
-                this.db.markWithdrawalFailed(withdrawal.withdrawalId, `Invalid address: ${e}`);
+                await this.db.markWithdrawalFailed(withdrawal.withdrawalId, `Invalid address: ${e}`);
             }
         }
 
