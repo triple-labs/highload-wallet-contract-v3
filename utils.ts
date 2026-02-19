@@ -3,5 +3,6 @@ export const getRandomInt = (min: number, max: number) => {
 }
 
 export const sleep = (ms: number) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    const safeMs = Number.isFinite(ms) ? Math.max(0, ms) : 0;
+    return new Promise(resolve => setTimeout(resolve, safeMs));
 }
