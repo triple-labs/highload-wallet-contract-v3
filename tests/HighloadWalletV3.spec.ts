@@ -8,7 +8,6 @@ import {SUBWALLET_ID, Errors, DEFAULT_TIMEOUT, maxKeyCount, maxShift} from "./im
 import { compile } from '@ton/blueprint';
 import { getRandomInt } from '../utils';
 import { findTransactionRequired, randomAddress } from '@ton/test-utils';
-import { MsgGenerator } from '../wrappers/MsgGenerator';
 import {HighloadQueryId} from "../wrappers/HighloadQueryId";
 
 
