@@ -34,7 +34,7 @@ export class MsgGenerator {
             .endCell()
 
         return beginCell()
-             .storeUint(2, 2) //ext_in_msg_info$11
+             .storeUint(2, 2) //ext_in_msg_info$10
              .storeSlice(ssrcInvalid.beginParse()) // src:INVALID
              .endCell();
     }
