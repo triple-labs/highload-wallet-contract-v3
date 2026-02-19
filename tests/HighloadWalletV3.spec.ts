@@ -589,7 +589,7 @@ describe('HighloadWalletV3', () => {
                         },
                         body: testBody
                     }
-                }], queryId: new HighloadQueryId(), value: 0n})
+                }], queryId: new HighloadQueryId(), value: 0n});
         const testResult = await highloadWalletV3.sendExternalMessage(
             keyPair.secretKey,
             {
