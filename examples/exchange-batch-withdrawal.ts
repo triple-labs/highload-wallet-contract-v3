@@ -237,7 +237,20 @@ async function main() {
     };
 
     // Your exchange's highload wallet address
-    const walletAddress = Address.parse('EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAU'); // Replace with your wallet
+    const rawWalletAddress = process.env.EXCHANGE_WALLET_ADDRESS;
+    if (!rawWalletAddress) {
+        throw new Error('EXCHANGE_WALLET_ADDRESS environment variable is not set. Please configure your highload wallet address before running this example.');
+    }
+    if (rawWalletAddress === 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAU') {
+        throw new Error('EXCHANGE_WALLET_ADDRESS is set to a placeholder zero address. Please replace it with your real highload wallet address.');
+    }
+
+    let walletAddress: Address;
+    try {
+        walletAddress = Address.parse(rawWalletAddress);
+    } catch (err) {
+        throw new Error('Failed to parse EXCHANGE_WALLET_ADDRESS as a valid TON address: ' + (err instanceof Error ? err.message : String(err)));
+    }
 
     // Initialize processor
     const processor = new BatchWithdrawalProcessor(
