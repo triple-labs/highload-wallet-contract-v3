@@ -12,6 +12,7 @@
 import { Cell } from '@ton/core';
 import { HighloadWalletV3 } from '../wrappers/HighloadWalletV3';
 import { compile } from '@ton/blueprint';
+import * as crypto from 'crypto';
 
 // Configuration
 const BASE_SUBWALLET_ID = 0x10ad; // Base subwallet ID for exchange
@@ -19,6 +20,14 @@ const TIMEOUT = 3600; // 1 hour
 
 /**
  * User to Address Mapping Database
+ *
+ * NOTE: This implementation uses in-memory Maps and is intended only for examples
+ * and local testing. All data is lost when the process exits or restarts and it
+ * does not scale for production use.
+ *
+ * In a real exchange deployment, replace this with a persistent data store
+ * (for example, PostgreSQL, MySQL, Redis, or another database) and ensure that
+ * mappings and subwallet IDs are durably stored and backed up.
  */
 class AddressMappingDatabase {
     private userToAddress: Map<string, string> = new Map();
@@ -111,10 +120,18 @@ class ExchangeAddressGenerator {
             return existingAddress;
         }
 
-        // Generate unique subwallet ID for this user
-        // Use a sequential number added to base subwallet ID
-        const userIdNumber = this.db.getNextUserIdNumber();
-        const subwalletId = this.baseSubwalletId + userIdNumber;
+        // Generate unique, non-sequential subwallet ID for this user
+        // Derive a 32-bit subwallet ID from a cryptographic hash of the userId and baseSubwalletId
+        const hash = crypto.createHash('sha256')
+            .update(userId)
+            .update(this.baseSubwalletId.toString())
+            .digest();
+        // Use first 4 bytes of the hash as an unsigned 32-bit integer
+        let subwalletId = hash.readUInt32BE(0);
+        // Avoid zero subwallet ID if that is considered special; fall back to baseSubwalletId in that rare case
+        if (subwalletId === 0) {
+            subwalletId = this.baseSubwalletId;
+        }
 
         // Create wallet with unique subwallet ID
         const wallet = HighloadWalletV3.createFromConfig(
@@ -154,7 +171,7 @@ class ExchangeAddressGenerator {
      * Get user ID from deposit address
      */
     async identifyUser(address: string): Promise<string | null> {
-        return await this.db.getUserForAddress(address);
+        return this.db.getUserForAddress(address);
     }
 
     /**
@@ -208,8 +225,9 @@ async function main() {
 
         // Your exchange's master public key
         // In production, load this from secure storage
-        const publicKey = Buffer.alloc(32, 0);
-        console.log('⚠️  Using mock public key - replace with your actual key in production!\n');
+        const publicKey = Buffer.from('DEMO_KEY_DO_NOT_USE_IN_PROD_DEMO_KEY_', 'utf8').subarray(0, 32);
+        console.warn('⚠️  INSECURE DEMO PUBLIC KEY IN USE');
+        console.warn('   This key is for examples ONLY. Generate a real key pair and load the public key from secure storage in production.\n');
 
         // Initialize generator
         const generator = new ExchangeAddressGenerator(code, publicKey);
@@ -270,8 +288,17 @@ function formatAddress(address: string): string {
 
 /**
  * Calculate required subwallet ID range for N users
+ *
+ * For userCount <= 0, returns a degenerate range where min === max === baseId.
  */
 function calculateSubwalletRange(baseId: number, userCount: number): { min: number; max: number } {
+    if (userCount <= 0) {
+        return {
+            min: baseId,
+            max: baseId
+        };
+    }
+
     return {
         min: baseId,
         max: baseId + userCount - 1

@@ -20,6 +20,7 @@ const API_ENDPOINT = 'https://toncenter.com/api/v2/jsonRPC';
 const SUBWALLET_ID = 0x10ad; // Your exchange wallet subwallet ID
 const TIMEOUT = 3600; // 1 hour timeout
 const MAX_BATCH_SIZE = 254; // Maximum messages per batch
+const TEST_USER_ADDRESS = 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c'; // Replace with real user address
 
 interface WithdrawalRequest {
     userId: string;
@@ -93,13 +94,13 @@ class BatchWithdrawalProcessor {
     /**
      * Create outgoing messages for withdrawals
      */
-    private createWithdrawalMessages(withdrawals: WithdrawalRequest[]): OutActionSendMsg[] {
+    private async createWithdrawalMessages(withdrawals: WithdrawalRequest[]): Promise<OutActionSendMsg[]> {
         const messages: OutActionSendMsg[] = [];
 
         for (const withdrawal of withdrawals) {
             try {
                 const destAddress = Address.parse(withdrawal.address);
-                
+
                 // Create internal transfer message
                 const message: OutActionSendMsg = {
                     type: 'sendMsg',
@@ -117,10 +118,10 @@ class BatchWithdrawalProcessor {
 
                 messages.push(message);
                 console.log(`  📤 ${withdrawal.userId}: ${withdrawal.amount} nanotons to ${withdrawal.address}`);
-                
+
             } catch (e) {
                 console.error(`  ⚠️  Invalid withdrawal ${withdrawal.withdrawalId}:`, e);
-                this.db.markWithdrawalFailed(withdrawal.withdrawalId, `Invalid address: ${e}`);
+                await this.db.markWithdrawalFailed(withdrawal.withdrawalId, `Invalid address: ${e}`);
             }
         }
 
@@ -162,7 +163,7 @@ class BatchWithdrawalProcessor {
             }
 
             // Create messages
-            const messages = this.createWithdrawalMessages(withdrawals);
+            const messages = await this.createWithdrawalMessages(withdrawals);
 
             if (messages.length === 0) {
                 console.log('⚠️  No valid messages to send');
@@ -193,7 +194,11 @@ class BatchWithdrawalProcessor {
             // 2. Verify transaction status
             // 3. Mark withdrawals as completed
             
-            // For now, simulate transaction hash
+            // For now, simulate transaction hash.
+            // NOTE: This is intentionally non-deterministic and intended for demo/testing only.
+            // Format: "batch_<queryId>_<unix_timestamp_seconds>", where the timestamp is based on
+            // the current wall-clock time. In production, always use the actual transaction hash
+            // obtained from the blockchain instead of this simulated value.
             const simulatedTxHash = `batch_${queryId.getQueryId()}_${createdAt}`;
             
             console.log(`✅ Batch sent successfully!`);
@@ -230,14 +235,38 @@ class BatchWithdrawalProcessor {
 async function main() {
     console.log('🚀 Exchange Batch Withdrawal Processor\n');
 
-    // In a real implementation, load these from secure storage
+    // In a real implementation, load these from secure storage or environment variables.
+    // For this example, we expect hex-encoded keys to be provided via environment variables.
+    const publicKeyHex = process.env.EXAMPLE_PUBLIC_KEY_HEX;
+    const secretKeyHex = process.env.EXAMPLE_SECRET_KEY_HEX;
+
+    if (!publicKeyHex || !secretKeyHex) {
+        throw new Error(
+            'Example key pair not configured. Set EXAMPLE_PUBLIC_KEY_HEX (32-byte hex) ' +
+            'and EXAMPLE_SECRET_KEY_HEX (64-byte hex) environment variables before running this example.'
+        );
+    }
+
     const mockKeyPair: KeyPair = {
-        publicKey: Buffer.alloc(32), // Replace with your public key
-        secretKey: Buffer.alloc(64)  // Replace with your secret key
+        publicKey: Buffer.from(publicKeyHex, 'hex'),
+        secretKey: Buffer.from(secretKeyHex, 'hex')
     };
 
     // Your exchange's highload wallet address
-    const walletAddress = Address.parse('EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAU'); // Replace with your wallet
+    const rawWalletAddress = process.env.EXCHANGE_WALLET_ADDRESS;
+    if (!rawWalletAddress) {
+        throw new Error('EXCHANGE_WALLET_ADDRESS environment variable is not set. Please configure your highload wallet address before running this example.');
+    }
+    if (rawWalletAddress === 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAU') {
+        throw new Error('EXCHANGE_WALLET_ADDRESS is set to a placeholder zero address. Please replace it with your real highload wallet address.');
+    }
+
+    let walletAddress: Address;
+    try {
+        walletAddress = Address.parse(rawWalletAddress);
+    } catch (err) {
+        throw new Error('Failed to parse EXCHANGE_WALLET_ADDRESS as a valid TON address: ' + (err instanceof Error ? err.message : String(err)));
+    }
 
     // Initialize processor
     const processor = new BatchWithdrawalProcessor(
@@ -253,21 +282,21 @@ async function main() {
     
     db.addTestWithdrawal({
         userId: 'user123',
-        address: 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c', // Replace with real address
+        address: TEST_USER_ADDRESS,
         amount: toNano('10'),
         withdrawalId: 'wd_001'
     });
 
     db.addTestWithdrawal({
         userId: 'user456',
-        address: 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c', // Replace with real address
+        address: TEST_USER_ADDRESS,
         amount: toNano('25.5'),
         withdrawalId: 'wd_002'
     });
 
     db.addTestWithdrawal({
         userId: 'user789',
-        address: 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c', // Replace with real address
+        address: TEST_USER_ADDRESS,
         amount: toNano('100'),
         withdrawalId: 'wd_003'
     });

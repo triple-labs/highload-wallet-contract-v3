@@ -4,7 +4,7 @@ export class MsgGenerator {
     constructor(readonly wc: number){}
 
     generateExternalOutWithBadSource() {
-        const ssrcInvalid =  beginCell()
+        const invalidSourceAddress =  beginCell()
             .storeUint(2, 2) // addr_std$10
             .storeUint(0, 1) // anycast nothing
             .storeInt(this.wc, 8) // workchain_id: -1
@@ -14,7 +14,7 @@ export class MsgGenerator {
         return beginCell()
         .storeUint(3, 2) // ext_out_msg_info$11
         .storeBit(0) // src:INVALID
-        .storeSlice(ssrcInvalid.beginParse())
+        .storeSlice(invalidSourceAddress.beginParse())
         .endCell();
 
     }
@@ -27,15 +27,15 @@ export class MsgGenerator {
             .endCell();
     }
     generateExternalInWithBadSource() {
-        const ssrcInvalid =  beginCell()
+        const invalidExternalAddress =  beginCell()
             .storeUint(1, 2) // addrExtern$01
             .storeUint(128, 9)
             .storeUint(0, 10)
             .endCell()
 
         return beginCell()
-             .storeUint(2, 2) //ext_in_msg_info$11
-             .storeSlice(ssrcInvalid.beginParse()) // src:INVALID
+             .storeUint(2, 2) //ext_in_msg_info$10
+             .storeSlice(invalidExternalAddress.beginParse()) // src:INVALID
              .endCell();
     }
     generateExternalInWithBadDst() {
@@ -95,7 +95,7 @@ export class MsgGenerator {
 }
 
     *generateBadMsg() {
-        // Meh
+        // Generator that yields various malformed message types for testing
         yield this.generateExternalInWithBadDst();
         yield this.generateExternalOutWithBadDst();
         yield this.generateExternalInWithBadSource();
