@@ -776,7 +776,6 @@ describe('HighloadWalletV3', () => {
         });
     });
     it('should ignore invalid message in payload', async () => {
-        const testAddr     = randomAddress(0);
         const badGenerator = new MsgGenerator(0);
         let queryIter    = new HighloadQueryId();
 
