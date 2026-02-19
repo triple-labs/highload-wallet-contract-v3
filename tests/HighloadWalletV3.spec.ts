@@ -350,7 +350,7 @@ describe('HighloadWalletV3', () => {
     });
 
     it('should be cleared queries hashmaps', async () => {
-        const message = highloadWalletV3.createInternalTransfer({actions: [], queryId: new HighloadQueryId(), value: 0n})
+        const message = highloadWalletV3.createInternalTransfer({actions: [], queryId: new HighloadQueryId(), value: 0n});
 
         const rndShift   = getRandomInt(0, maxShift);
         const rndBitNum  = getRandomInt(0, 1022);
