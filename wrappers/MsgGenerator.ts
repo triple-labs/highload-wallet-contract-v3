@@ -71,10 +71,10 @@ export class MsgGenerator {
             .endCell();
     }
     generateInternalMessageWithBadInitStateData() {
-        const ssrc = randomAddress(this.wc);
-        const sdest = randomAddress(this.wc);
+        const src = randomAddress(this.wc);
+        const dst = randomAddress(this.wc);
 
-        const init_state_with_bad_data = beginCell()
+        const initStateWithBadData = beginCell()
             .storeUint(0, 1) // maybe (##5)
             .storeUint(1, 1) // Maybe TickTock
             .storeUint(1, 1) // bool Tick
@@ -89,8 +89,8 @@ export class MsgGenerator {
             .storeUint(0, 1) // ihr_disabled:Bool
             .storeUint(0, 1) // bounce:Bool
             .storeUint(0, 1) // bounced:Bool
-            .storeAddress(ssrc) // src:MsgAddress
-            .storeAddress(sdest) // dest:MsgAddress
+            .storeAddress(src) // src:MsgAddress
+            .storeAddress(dst) // dest:MsgAddress
             .storeCoins(0) //
             .storeMaybeRef(null) // extra currencies
             .storeCoins(0) // ihr_fee
@@ -99,7 +99,7 @@ export class MsgGenerator {
             .storeUint(1000, 32) // created_at:uint32
             .storeUint(1, 1) // Maybe init_state
             .storeUint(1, 1) // Either (X ^X) init state
-            .storeRef(init_state_with_bad_data.endCell())
+            .storeRef(initStateWithBadData.endCell())
             .storeUint(0, 1) // Either (X ^X) body
             .endCell();
     }
