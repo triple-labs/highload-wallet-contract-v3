@@ -122,16 +122,30 @@ class ExchangeAddressGenerator {
 
         // Generate unique, non-sequential subwallet ID for this user
         // Derive a 32-bit subwallet ID from a cryptographic hash of the userId and baseSubwalletId
-        const hash = crypto.createHash('sha256')
-            .update(userId)
-            .update(this.baseSubwalletId.toString())
-            .digest();
-        // Use first 4 bytes of the hash as an unsigned 32-bit integer
-        let subwalletId = hash.readUInt32BE(0);
-        // Avoid zero subwallet ID if that is considered special; fall back to baseSubwalletId in that rare case
-        if (subwalletId === 0) {
-            subwalletId = this.baseSubwalletId;
-        }
+        let subwalletId: number;
+        let nonce = 0;
+        const maxAttempts = 1000; // Prevent infinite loops in case of issues
+        
+        do {
+            const hash = crypto.createHash('sha256')
+                .update(userId)
+                .update(this.baseSubwalletId.toString())
+                .update(nonce.toString())
+                .digest();
+            // Use first 4 bytes of the hash as an unsigned 32-bit integer
+            subwalletId = hash.readUInt32BE(0);
+            // Avoid zero subwallet ID if that is considered special; fall back to baseSubwalletId in that rare case
+            if (subwalletId === 0) {
+                subwalletId = this.baseSubwalletId;
+            }
+            nonce++;
+            
+            if (nonce >= maxAttempts) {
+                throw new Error(`Failed to generate unique subwallet ID for user ${userId} after ${maxAttempts} attempts`);
+            }
+            
+            // Check for collision with existing subwallet IDs
+        } while (Array.from(this.db.getAllMappings()).some(m => m.subwalletId === subwalletId));
 
         // Create wallet with unique subwallet ID
         const wallet = HighloadWalletV3.createFromConfig(
@@ -170,7 +184,7 @@ class ExchangeAddressGenerator {
     /**
      * Get user ID from deposit address
      */
-    async identifyUser(address: string): Promise<string | null> {
+    identifyUser(address: string): Promise<string | null> {
         return this.db.getUserForAddress(address);
     }
 
