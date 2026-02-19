@@ -864,7 +864,7 @@ describe('HighloadWalletV3', () => {
         };
         let fail = false;
         try {
-            const reply = await blockchain.sendMessage(replyExt);
+            await blockchain.sendMessage(replyExt);
         } catch (e) {
             fail = true;
         }
