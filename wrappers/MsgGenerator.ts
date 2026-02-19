@@ -95,7 +95,7 @@ export class MsgGenerator {
 }
 
     *generateBadMsg() {
-        // Meh
+        // Generator that yields various malformed message types for testing
         yield this.generateExternalInWithBadDst();
         yield this.generateExternalOutWithBadDst();
         yield this.generateExternalInWithBadSource();
