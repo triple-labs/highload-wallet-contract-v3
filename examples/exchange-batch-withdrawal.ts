@@ -242,6 +242,8 @@ async function main() {
 
     if (!publicKeyHex || !secretKeyHex) {
         throw new Error(
+            'Example key pair not configured. Set EXAMPLE_PUBLIC_KEY_HEX (64 hex characters / 32 bytes) ' +
+            'and EXAMPLE_SECRET_KEY_HEX (128 hex characters / 64 bytes) environment variables before running this example.'
             'Example key pair not configured. Set EXAMPLE_PUBLIC_KEY_HEX (32-byte hex) ' +
             'and EXAMPLE_SECRET_KEY_HEX (64-byte hex) environment variables before running this example.'
         );
@@ -251,6 +253,14 @@ async function main() {
         publicKey: Buffer.from(publicKeyHex, 'hex'),
         secretKey: Buffer.from(secretKeyHex, 'hex')
     };
+
+    // Validate key lengths
+    if (mockKeyPair.publicKey.length !== 32) {
+        throw new Error(`Invalid public key length: expected 32 bytes but got ${mockKeyPair.publicKey.length} bytes. Ensure EXAMPLE_PUBLIC_KEY_HEX contains exactly 64 hex characters.`);
+    }
+    if (mockKeyPair.secretKey.length !== 64) {
+        throw new Error(`Invalid secret key length: expected 64 bytes but got ${mockKeyPair.secretKey.length} bytes. Ensure EXAMPLE_SECRET_KEY_HEX contains exactly 128 hex characters.`);
+    }
 
     // Your exchange's highload wallet address
     const rawWalletAddress = process.env.EXCHANGE_WALLET_ADDRESS;
