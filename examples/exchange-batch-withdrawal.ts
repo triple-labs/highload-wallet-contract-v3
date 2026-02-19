@@ -193,7 +193,11 @@ class BatchWithdrawalProcessor {
             // 2. Verify transaction status
             // 3. Mark withdrawals as completed
             
-            // For now, simulate transaction hash
+            // For now, simulate transaction hash.
+            // NOTE: This is intentionally non-deterministic and intended for demo/testing only.
+            // Format: "batch_<queryId>_<unix_timestamp_seconds>", where the timestamp is based on
+            // the current wall-clock time. In production, always use the actual transaction hash
+            // obtained from the blockchain instead of this simulated value.
             const simulatedTxHash = `batch_${queryId.getQueryId()}_${createdAt}`;
             
             console.log(`✅ Batch sent successfully!`);
