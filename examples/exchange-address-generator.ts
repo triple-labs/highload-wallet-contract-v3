@@ -154,7 +154,7 @@ class ExchangeAddressGenerator {
      * Get user ID from deposit address
      */
     async identifyUser(address: string): Promise<string | null> {
-        return await this.db.getUserForAddress(address);
+        return this.db.getUserForAddress(address);
     }
 
     /**
