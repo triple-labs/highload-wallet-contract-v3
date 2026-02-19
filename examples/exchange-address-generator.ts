@@ -19,6 +19,14 @@ const TIMEOUT = 3600; // 1 hour
 
 /**
  * User to Address Mapping Database
+ *
+ * NOTE: This implementation uses in-memory Maps and is intended only for examples
+ * and local testing. All data is lost when the process exits or restarts and it
+ * does not scale for production use.
+ *
+ * In a real exchange deployment, replace this with a persistent data store
+ * (for example, PostgreSQL, MySQL, Redis, or another database) and ensure that
+ * mappings and subwallet IDs are durably stored and backed up.
  */
 class AddressMappingDatabase {
     private userToAddress: Map<string, string> = new Map();
@@ -154,7 +162,7 @@ class ExchangeAddressGenerator {
      * Get user ID from deposit address
      */
     async identifyUser(address: string): Promise<string | null> {
-        return await this.db.getUserForAddress(address);
+        return this.db.getUserForAddress(address);
     }
 
     /**
@@ -208,8 +216,9 @@ async function main() {
 
         // Your exchange's master public key
         // In production, load this from secure storage
-        const publicKey = Buffer.alloc(32, 0);
-        console.log('⚠️  Using mock public key - replace with your actual key in production!\n');
+        const publicKey = Buffer.from('DEMO_KEY_DO_NOT_USE_IN_PROD_DEMO_KEY_', 'utf8').subarray(0, 32);
+        console.warn('⚠️  INSECURE DEMO PUBLIC KEY IN USE');
+        console.warn('   This key is for examples ONLY. Generate a real key pair and load the public key from secure storage in production.\n');
 
         // Initialize generator
         const generator = new ExchangeAddressGenerator(code, publicKey);
@@ -270,8 +279,17 @@ function formatAddress(address: string): string {
 
 /**
  * Calculate required subwallet ID range for N users
+ *
+ * For userCount <= 0, returns a degenerate range where min === max === baseId.
  */
 function calculateSubwalletRange(baseId: number, userCount: number): { min: number; max: number } {
+    if (userCount <= 0) {
+        return {
+            min: baseId,
+            max: baseId
+        };
+    }
+
     return {
         min: baseId,
         max: baseId + userCount - 1
