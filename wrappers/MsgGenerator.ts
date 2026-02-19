@@ -1,7 +1,18 @@
-import { Cell, CommonMessageInfoExternalIn, CommonMessageInfoExternalOut, ExternalAddress, Message, MessageRelaxed, StateInit, beginCell, storeMessage, storeMessageRelaxed } from '@ton/core';
+import {
+    Cell,
+    CommonMessageInfoExternalIn,
+    CommonMessageInfoExternalOut,
+    ExternalAddress,
+    Message,
+    MessageRelaxed,
+    StateInit,
+    beginCell,
+    storeMessage,
+    storeMessageRelaxed,
+} from '@ton/core';
 import { randomAddress } from '@ton/test-utils';
 export class MsgGenerator {
-    constructor(readonly wc: number){}
+    constructor(readonly wc: number) {}
 
     generateExternalOutWithBadSource() {
         const invalidSourceAddress = beginCell()
@@ -9,14 +20,13 @@ export class MsgGenerator {
             .storeUint(0, 1) // anycast nothing
             .storeInt(this.wc, 8) // workchain_id: -1
             .storeUint(1, 10)
-            .endCell()
+            .endCell();
 
         return beginCell()
-        .storeUint(3, 2) // ext_out_msg_info$11
-        .storeBit(0) // src:INVALID
-        .storeSlice(invalidSourceAddress.beginParse())
-        .endCell();
-
+            .storeUint(3, 2) // ext_out_msg_info$11
+            .storeBit(0) // src:INVALID
+            .storeSlice(invalidSourceAddress.beginParse())
+            .endCell();
     }
     generateExternalOutWithBadDst() {
         const src = randomAddress(-1);
@@ -27,16 +37,16 @@ export class MsgGenerator {
             .endCell();
     }
     generateExternalInWithBadSource() {
-        const invalidExternalAddress =  beginCell()
+        const invalidExternalAddress = beginCell()
             .storeUint(1, 2) // addrExtern$01
             .storeUint(128, 9)
             .storeUint(0, 10)
-            .endCell()
+            .endCell();
 
         return beginCell()
-             .storeUint(2, 2) //ext_in_msg_info$10
-             .storeSlice(invalidExternalAddress.beginParse()) // src:INVALID
-             .endCell();
+            .storeUint(2, 2) //ext_in_msg_info$10
+            .storeSlice(invalidExternalAddress.beginParse()) // src:INVALID
+            .endCell();
     }
     generateExternalInWithBadDst() {
         const src = new ExternalAddress(BigInt(Date.now()), 256);
@@ -56,25 +66,25 @@ export class MsgGenerator {
             .storeUint(0, 1) // bounced:Bool
             .storeAddress(src) // src:MsgAddress
             .storeAddress(dst) // dest:MsgAddress
-            .storeUint(8, 4)  // len of nanograms
+            .storeUint(8, 4) // len of nanograms
             .storeUint(1, 1) // INVALID GRAMS amount
             .endCell();
-
     }
     generateInternalMessageWithBadInitStateData() {
-    const ssrc  = randomAddress(this.wc);
-    const sdest = randomAddress(this.wc);
+        const ssrc = randomAddress(this.wc);
+        const sdest = randomAddress(this.wc);
 
-    const init_state_with_bad_data = beginCell().storeUint(0, 1) // maybe (##5)
-                      .storeUint(1, 1) // Maybe TickTock
-                      .storeUint(1, 1) // bool Tick
-                      .storeUint(0, 1) // bool Tock
-                      .storeUint(1, 1) // code: Maybe Cell^
-                      .storeUint(1, 1) // data: Maybe Cell^
-                      .storeUint(1, 1); // library: Maybe ^Cell
-                      // bits for references but no data
+        const init_state_with_bad_data = beginCell()
+            .storeUint(0, 1) // maybe (##5)
+            .storeUint(1, 1) // Maybe TickTock
+            .storeUint(1, 1) // bool Tick
+            .storeUint(0, 1) // bool Tock
+            .storeUint(1, 1) // code: Maybe Cell^
+            .storeUint(1, 1) // data: Maybe Cell^
+            .storeUint(1, 1); // library: Maybe ^Cell
+        // bits for references but no data
 
-    return beginCell()
+        return beginCell()
             .storeUint(0, 1) // int_msg_info$0
             .storeUint(0, 1) // ihr_disabled:Bool
             .storeUint(0, 1) // bounce:Bool
@@ -92,7 +102,7 @@ export class MsgGenerator {
             .storeRef(init_state_with_bad_data.endCell())
             .storeUint(0, 1) // Either (X ^X) body
             .endCell();
-}
+    }
 
     *generateBadMsg() {
         // Generator that yields various malformed message types for testing
@@ -108,13 +118,13 @@ export class MsgGenerator {
             type: 'external-in',
             dest: info?.dest || randomAddress(this.wc),
             src: info?.src,
-            importFee: info?.importFee || 0n
-        }
+            importFee: info?.importFee || 0n,
+        };
         const newMsg: Message = {
             info: msgInfo,
             body: body || Cell.EMPTY,
-            init
-        }
+            init,
+        };
         return beginCell().store(storeMessage(newMsg)).endCell();
     }
     generateExternalOutMsg(info?: Partial<CommonMessageInfoExternalOut>, body?: Cell) {
@@ -123,12 +133,12 @@ export class MsgGenerator {
             createdAt: info?.createdAt || 0,
             createdLt: info?.createdLt || 0n,
             src: info?.src || randomAddress(this.wc),
-            dest: info?.dest
-        }
+            dest: info?.dest,
+        };
         const newMsg: MessageRelaxed = {
             info: msgInfo,
             body: body || Cell.EMPTY,
-        }
+        };
         return beginCell().store(storeMessageRelaxed(newMsg)).endCell();
     }
 }

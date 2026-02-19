@@ -1,6 +1,5 @@
 const BIT_NUMBER_SIZE = 10n; // 10 bit
 const MAX_SHIFT = 8191n; // 2^13 = 8192
-const MAX_BIT_NUMBER = (1n << BIT_NUMBER_SIZE) - 1n; // 2^10 - 1 = 1023
 const MAX_BIT_NUMBER = (1n << BIT_NUMBER_SIZE) - 1n; // 2^BIT_NUMBER_SIZE - 1 (1023n for 10 bits)
 
 export class HighloadQueryId {
@@ -15,20 +14,27 @@ export class HighloadQueryId {
     static fromShiftAndBitNumber(shift: bigint, bitnumber: bigint): HighloadQueryId {
         const q = new HighloadQueryId();
         q.shift = shift;
-        if (q.shift < 0) throw new Error('invalid shift');
-        if (q.shift > MAX_SHIFT) throw new Error('invalid shift');
+        if (q.shift < 0n) {
+            throw new Error(`invalid shift: ${q.shift}, expected in range [0, ${MAX_SHIFT}]`);
+        }
+        if (q.shift > MAX_SHIFT) {
+            throw new Error(`invalid shift: ${q.shift}, expected in range [0, ${MAX_SHIFT}]`);
+        }
         q.bitnumber = bitnumber;
-        if (q.bitnumber < 0) throw new Error('invalid bitnumber');
-        if (q.bitnumber > MAX_BIT_NUMBER) throw new Error('invalid bitnumber');
+        if (q.bitnumber < 0n) {
+            throw new Error(`invalid bitnumber: ${q.bitnumber}, expected in range [0, ${MAX_BIT_NUMBER}]`);
+        }
+        if (q.bitnumber > MAX_BIT_NUMBER) {
+            throw new Error(`invalid bitnumber: ${q.bitnumber}, expected in range [0, ${MAX_BIT_NUMBER}]`);
+        }
         return q;
     }
-
 
     getNext() {
         let newBitnumber = this.bitnumber + 1n;
         let newShift = this.shift;
 
-        if (newShift === MAX_SHIFT && newBitnumber > (MAX_BIT_NUMBER - 1n)) {
+        if (newShift === MAX_SHIFT && newBitnumber > MAX_BIT_NUMBER - 1n) {
             throw new Error('Overload'); // NOTE: we left one queryId for emergency withdraw
         }
 
@@ -36,7 +42,7 @@ export class HighloadQueryId {
             newBitnumber = 0n;
             newShift += 1n;
             if (newShift > MAX_SHIFT) {
-                throw new Error('Overload')
+                throw new Error('Overload');
             }
         }
 
@@ -44,7 +50,7 @@ export class HighloadQueryId {
     }
 
     hasNext() {
-        const isEnd = this.bitnumber >= (MAX_BIT_NUMBER - 1n) && this.shift === MAX_SHIFT; // NOTE: we left one queryId for emergency withdraw;
+        const isEnd = this.bitnumber >= MAX_BIT_NUMBER - 1n && this.shift === MAX_SHIFT; // NOTE: we left one queryId for emergency withdraw;
         return !isEnd;
     }
 
