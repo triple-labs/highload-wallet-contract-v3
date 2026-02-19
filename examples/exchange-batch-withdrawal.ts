@@ -20,6 +20,7 @@ const API_ENDPOINT = 'https://toncenter.com/api/v2/jsonRPC';
 const SUBWALLET_ID = 0x10ad; // Your exchange wallet subwallet ID
 const TIMEOUT = 3600; // 1 hour timeout
 const MAX_BATCH_SIZE = 254; // Maximum messages per batch
+const TEST_USER_ADDRESS = 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c'; // Replace with real user address
 
 interface WithdrawalRequest {
     userId: string;
@@ -162,7 +163,7 @@ class BatchWithdrawalProcessor {
             }
 
             // Create messages
-            const messages = this.createWithdrawalMessages(withdrawals);
+            const messages = await this.createWithdrawalMessages(withdrawals);
 
             if (messages.length === 0) {
                 console.log('⚠️  No valid messages to send');
@@ -234,10 +235,21 @@ class BatchWithdrawalProcessor {
 async function main() {
     console.log('🚀 Exchange Batch Withdrawal Processor\n');
 
-    // In a real implementation, load these from secure storage
+    // In a real implementation, load these from secure storage or environment variables.
+    // For this example, we expect hex-encoded keys to be provided via environment variables.
+    const publicKeyHex = process.env.EXAMPLE_PUBLIC_KEY_HEX;
+    const secretKeyHex = process.env.EXAMPLE_SECRET_KEY_HEX;
+
+    if (!publicKeyHex || !secretKeyHex) {
+        throw new Error(
+            'Example key pair not configured. Set EXAMPLE_PUBLIC_KEY_HEX (32-byte hex) ' +
+            'and EXAMPLE_SECRET_KEY_HEX (64-byte hex) environment variables before running this example.'
+        );
+    }
+
     const mockKeyPair: KeyPair = {
-        publicKey: Buffer.alloc(32), // Replace with your public key
-        secretKey: Buffer.alloc(64)  // Replace with your secret key
+        publicKey: Buffer.from(publicKeyHex, 'hex'),
+        secretKey: Buffer.from(secretKeyHex, 'hex')
     };
 
     // Your exchange's highload wallet address
@@ -270,21 +282,21 @@ async function main() {
     
     db.addTestWithdrawal({
         userId: 'user123',
-        address: 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c', // Replace with real address
+        address: TEST_USER_ADDRESS,
         amount: toNano('10'),
         withdrawalId: 'wd_001'
     });
 
     db.addTestWithdrawal({
         userId: 'user456',
-        address: 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c', // Replace with real address
+        address: TEST_USER_ADDRESS,
         amount: toNano('25.5'),
         withdrawalId: 'wd_002'
     });
 
     db.addTestWithdrawal({
         userId: 'user789',
-        address: 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c', // Replace with real address
+        address: TEST_USER_ADDRESS,
         amount: toNano('100'),
         withdrawalId: 'wd_003'
     });

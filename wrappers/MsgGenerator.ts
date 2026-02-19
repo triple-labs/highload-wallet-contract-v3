@@ -27,7 +27,7 @@ export class MsgGenerator {
             .endCell();
     }
     generateExternalInWithBadSource() {
-        const ssrcInvalid =  beginCell()
+        const invalidExternalAddress =  beginCell()
             .storeUint(1, 2) // addrExtern$01
             .storeUint(128, 9)
             .storeUint(0, 10)
@@ -35,7 +35,7 @@ export class MsgGenerator {
 
         return beginCell()
              .storeUint(2, 2) //ext_in_msg_info$10
-             .storeSlice(ssrcInvalid.beginParse()) // src:INVALID
+             .storeSlice(invalidExternalAddress.beginParse()) // src:INVALID
              .endCell();
     }
     generateExternalInWithBadDst() {
