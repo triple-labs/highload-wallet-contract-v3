@@ -163,7 +163,7 @@ describe('HighloadWalletV3', () => {
     it('should fail subwallet check', async () => {
         let badSubwallet;
 
-        const message = highloadWalletV3.createInternalTransfer({actions: [], queryId: HighloadQueryId.fromQueryId(0n), value: 0n})
+        const message = highloadWalletV3.createInternalTransfer({actions: [], queryId: HighloadQueryId.fromQueryId(0n), value: 0n});
         const curSubwallet= await highloadWalletV3.getSubwalletId();
         expect(curSubwallet).toEqual(SUBWALLET_ID);
 
