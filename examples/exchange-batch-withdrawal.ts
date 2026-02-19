@@ -13,7 +13,6 @@ import { Address, toNano, SendMode, beginCell, internal, OutActionSendMsg } from
 import { TonClient } from '@ton/ton';
 import { HighloadWalletV3 } from '../wrappers/HighloadWalletV3';
 import { HighloadQueryId } from '../wrappers/HighloadQueryId';
-import { compile } from '@ton/blueprint';
 import { KeyPair } from 'ton-crypto';
 
 // Configuration
