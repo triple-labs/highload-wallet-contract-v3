@@ -270,8 +270,17 @@ function formatAddress(address: string): string {
 
 /**
  * Calculate required subwallet ID range for N users
+ *
+ * For userCount <= 0, returns a degenerate range where min === max === baseId.
  */
 function calculateSubwalletRange(baseId: number, userCount: number): { min: number; max: number } {
+    if (userCount <= 0) {
+        return {
+            min: baseId,
+            max: baseId
+        };
+    }
+
     return {
         min: baseId,
         max: baseId + userCount - 1
