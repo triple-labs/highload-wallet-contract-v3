@@ -1,6 +1,7 @@
 const BIT_NUMBER_SIZE = 10n; // 10 bit
 const MAX_SHIFT = 8191n; // 2^13 = 8192
 const MAX_BIT_NUMBER = (1n << BIT_NUMBER_SIZE) - 1n; // 2^10 - 1 = 1023
+const MAX_BIT_NUMBER = (1n << BIT_NUMBER_SIZE) - 1n; // 2^BIT_NUMBER_SIZE - 1 (1023n for 10 bits)
 
 export class HighloadQueryId {
     private shift: bigint; // [0 .. 8191]

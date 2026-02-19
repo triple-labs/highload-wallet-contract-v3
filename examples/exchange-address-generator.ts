@@ -146,6 +146,12 @@ class ExchangeAddressGenerator {
             
             // Check for collision with existing subwallet IDs
         } while (Array.from(this.db.getAllMappings()).some(m => m.subwalletId === subwalletId));
+        const hash = crypto.createHash('sha256')
+            .update(userId)
+            .update(this.baseSubwalletId.toString())
+            .digest();
+        // Use first 4 bytes of the hash as an unsigned 32-bit integer
+        const subwalletId = hash.readUInt32BE(0);
 
         // Create wallet with unique subwallet ID
         const wallet = HighloadWalletV3.createFromConfig(
@@ -185,6 +191,7 @@ class ExchangeAddressGenerator {
      * Get user ID from deposit address
      */
     identifyUser(address: string): Promise<string | null> {
+    async identifyUser(address: string): Promise<string | null> {
         return this.db.getUserForAddress(address);
     }
 

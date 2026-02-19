@@ -244,6 +244,8 @@ async function main() {
         throw new Error(
             'Example key pair not configured. Set EXAMPLE_PUBLIC_KEY_HEX (64 hex characters / 32 bytes) ' +
             'and EXAMPLE_SECRET_KEY_HEX (128 hex characters / 64 bytes) environment variables before running this example.'
+            'Example key pair not configured. Set EXAMPLE_PUBLIC_KEY_HEX (32-byte hex) ' +
+            'and EXAMPLE_SECRET_KEY_HEX (64-byte hex) environment variables before running this example.'
         );
     }
 
@@ -287,6 +289,11 @@ async function main() {
 
     // Add some test withdrawals
     const db = processor.getDatabase();
+    
+    // Validate that test address is not the placeholder zero address
+    if (TEST_USER_ADDRESS === 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c') {
+        console.warn('⚠️  WARNING: Using placeholder test address. Replace TEST_USER_ADDRESS with real addresses for production use.');
+    }
     
     db.addTestWithdrawal({
         userId: 'user123',

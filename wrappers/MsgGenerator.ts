@@ -4,7 +4,7 @@ export class MsgGenerator {
     constructor(readonly wc: number){}
 
     generateExternalOutWithBadSource() {
-        const invalidSourceAddress =  beginCell()
+        const invalidSourceAddress = beginCell()
             .storeUint(2, 2) // addr_std$10
             .storeUint(0, 1) // anycast nothing
             .storeInt(this.wc, 8) // workchain_id: -1
