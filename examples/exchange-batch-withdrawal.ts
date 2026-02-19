@@ -284,24 +284,6 @@ async function main() {
     console.log('\n✅ Batch processing complete!\n');
 }
 
-/**
- * Continuous processing mode
- */
-async function continuousProcessing(processor: BatchWithdrawalProcessor, intervalMs: number = 30000) {
-    console.log(`🔄 Starting continuous withdrawal processing (interval: ${intervalMs}ms)\n`);
-
-    while (true) {
-        try {
-            await processor.processBatch();
-        } catch (e) {
-            console.error('Error in continuous processing:', e);
-        }
-
-        // Wait before next batch
-        await new Promise(resolve => setTimeout(resolve, intervalMs));
-    }
-}
-
 // Run if executed directly
 if (require.main === module) {
     main().catch(console.error);
