@@ -208,8 +208,9 @@ async function main() {
 
         // Your exchange's master public key
         // In production, load this from secure storage
-        const publicKey = Buffer.alloc(32, 0);
-        console.log('⚠️  Using mock public key - replace with your actual key in production!\n');
+        const publicKey = Buffer.from('DEMO_KEY_DO_NOT_USE_IN_PROD_DEMO_KEY_', 'utf8').subarray(0, 32);
+        console.warn('⚠️  INSECURE DEMO PUBLIC KEY IN USE');
+        console.warn('   This key is for examples ONLY. Generate a real key pair and load the public key from secure storage in production.\n');
 
         // Initialize generator
         const generator = new ExchangeAddressGenerator(code, publicKey);
