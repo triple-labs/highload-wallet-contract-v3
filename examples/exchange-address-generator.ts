@@ -9,7 +9,7 @@
  *   ts-node examples/exchange-address-generator.ts
  */
 
-import { Address, Cell, toNano } from '@ton/core';
+import { Cell } from '@ton/core';
 import { HighloadWalletV3 } from '../wrappers/HighloadWalletV3';
 import { compile } from '@ton/blueprint';
 
