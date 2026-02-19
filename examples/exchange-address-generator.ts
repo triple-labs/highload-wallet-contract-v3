@@ -19,6 +19,14 @@ const TIMEOUT = 3600; // 1 hour
 
 /**
  * User to Address Mapping Database
+ *
+ * NOTE: This implementation uses in-memory Maps and is intended only for examples
+ * and local testing. All data is lost when the process exits or restarts and it
+ * does not scale for production use.
+ *
+ * In a real exchange deployment, replace this with a persistent data store
+ * (for example, PostgreSQL, MySQL, Redis, or another database) and ensure that
+ * mappings and subwallet IDs are durably stored and backed up.
  */
 class AddressMappingDatabase {
     private userToAddress: Map<string, string> = new Map();
