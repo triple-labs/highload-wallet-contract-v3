@@ -127,11 +127,7 @@ class ExchangeAddressGenerator {
             .update(this.baseSubwalletId.toString())
             .digest();
         // Use first 4 bytes of the hash as an unsigned 32-bit integer
-        let subwalletId = hash.readUInt32BE(0);
-        // Avoid zero subwallet ID if that is considered special; fall back to baseSubwalletId in that rare case
-        if (subwalletId === 0) {
-            subwalletId = this.baseSubwalletId;
-        }
+        const subwalletId = hash.readUInt32BE(0);
 
         // Create wallet with unique subwallet ID
         const wallet = HighloadWalletV3.createFromConfig(

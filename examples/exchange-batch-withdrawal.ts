@@ -280,6 +280,11 @@ async function main() {
     // Add some test withdrawals
     const db = processor.getDatabase();
     
+    // Validate that test address is not the placeholder zero address
+    if (TEST_USER_ADDRESS === 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c') {
+        console.warn('⚠️  WARNING: Using placeholder test address. Replace TEST_USER_ADDRESS with real addresses for production use.');
+    }
+    
     db.addTestWithdrawal({
         userId: 'user123',
         address: TEST_USER_ADDRESS,
